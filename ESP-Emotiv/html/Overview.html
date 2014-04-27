@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<body>
+	<h1>ESP-Emotiv - EEG Signal Processing for the  Emotiv</h1>
+	<h2>Release 1.3-SNAPSHOT, 27-04-14</h2>
+
+	<p>
+		This Java library provides the implementation of <a href="http://mrstampy.github.com/ESP/">ESP</a> library classes to acquire the
+		EEG signal from the Emotiv. 
+		ESP-Emotiv was compiled for Java version 1.6 compatibility. The core classes have been designed with speed and concurrency
+		in mind using high performance Java libraries:
+	<ul>
+		<li><a href="https://github.com/LMAX-Exchange/disruptor">Disruptor</a></li>
+		<li><a href="http://javolution.org/">Javolution</a></li>
+		<li><a href="http://mina.apache.org/">Apache MINA</a></li>
+	</ul>
+	</p>
+	
+	<h2>Architecture</h2>
+	
+	<img src="LocalMCSUse.jpg" alt="Local use of the Multi Connection Emotiv Socket" />
+	<p>
+		The <a href="com/github/mrstampy/esp/nia/MultiConnectEmotivSocket.html">MultiConnectEmotivSocket</a>
+		is the core class of this library.  Listeners can register themselves with the socket implementation and will receive the generated
+		events as they occur, allowing near-realtime signal acquisition from the device. 
+	</p>
+	<p>
+		But this doesn't explain the 'multi connection' name...
+	</p>
+	
+	<h3>Remote Connection to the Multi Connection Emotiv Socket</h3>
+	<img src="RemoteMCSUse.png" alt="Remote use of the Multi Connection Emotiv Socket" />
+	<p>
+		The Multi Connection Emotiv Socket allows connections from the
+		<a href="com/github/mrstampy/esp/nia/subscription/EmotivSocketConnector.html">EmotivSocketConnector</a>.
+		Multi connection sockets can accept many such remote connections (theoretically thousands).
+		The connections can be running in the same JVM or in different Java programs, even on different computers.  Due to the introduced
+		latency resulting from the remote connection the signal received cannot be considered near-realtime, however the socket connector
+		is quite useful for highly buffered signals and for applications such as data recorders. 
+	</p>
+	<p>
+		Applications using the socket connector create the connection to the multi connection socket and subscribe to receive 
+		device-specific events.  Listeners register themselves with the socket connector and receive the event notifications
+		as they are received by the socket connector.
+	</p>
+
+	Additional functionality is described in these JavaDocs. This work is
+	released under the GPL 3.0 license. No warranty of any kind is offered.
+	<a href="http://mrstampy.github.com/ESP-Emotiv/">ESP-Emotiv</a> Copyright (C) 2014 Burton Alexander. 
+
+	Emotiv <sup>TM</sup> is the trademark of <a href="http://www.emotiv.com">Emotiv</a>.
+	Emokit Copyright Samuel Halliday 2012
+</body>
+</html>
