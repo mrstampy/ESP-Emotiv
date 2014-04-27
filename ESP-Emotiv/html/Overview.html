@@ -21,7 +21,7 @@
 	
 	<img src="LocalMCSUse.jpg" alt="Local use of the Multi Connection Emotiv Socket" />
 	<p>
-		The <a href="com/github/mrstampy/esp/nia/MultiConnectEmotivSocket.html">MultiConnectEmotivSocket</a>
+		The <a href="com/github/mrstampy/esp/emotiv/MultiConnectEmotivSocket.html">MultiConnectEmotivSocket</a>
 		is the core class of this library.  Listeners can register themselves with the socket implementation and will receive the generated
 		events as they occur, allowing near-realtime signal acquisition from the device. 
 	</p>
@@ -33,7 +33,7 @@
 	<img src="RemoteMCSUse.png" alt="Remote use of the Multi Connection Emotiv Socket" />
 	<p>
 		The Multi Connection Emotiv Socket allows connections from the
-		<a href="com/github/mrstampy/esp/nia/subscription/EmotivSocketConnector.html">EmotivSocketConnector</a>.
+		<a href="com/github/mrstampy/esp/emotiv/subscription/EmotivSocketConnector.html">EmotivSocketConnector</a>.
 		Multi connection sockets can accept many such remote connections (theoretically thousands).
 		The connections can be running in the same JVM or in different Java programs, even on different computers.  Due to the introduced
 		latency resulting from the remote connection the signal received cannot be considered near-realtime, however the socket connector
