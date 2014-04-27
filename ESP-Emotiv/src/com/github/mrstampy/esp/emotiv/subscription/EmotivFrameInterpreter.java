@@ -68,8 +68,6 @@ public class EmotivFrameInterpreter implements Serializable {
 	 *         available.
 	 */
 	private int getBatteryLevel() {
-		if (!isBattery()) return -1;
-
 		int battery = 0xFF & frame[0];
 
 		if (battery >= 248) return 100;
