@@ -20,18 +20,53 @@ package com.github.mrstampy.esp.emotiv.subscription;
 
 import com.github.mrstampy.esp.multiconnectionsocket.event.AbstractMultiConnectionEvent;
 
-public class EmotivEvent extends AbstractMultiConnectionEvent<Sensor> {
+public class EmotivEvent extends AbstractMultiConnectionEvent<Sensor> implements FrameInterpreter {
 	private static final long serialVersionUID = 3880422949695371519L;
 	
-	private final EmotivFrameInterpreter interpreter;
+	private final FrameInterpreter interpreter;
 
 	public EmotivEvent(EmotivFrameInterpreter interpreter) {
 		super(interpreter.getSensor());
 		this.interpreter = interpreter;
 	}
 
-	public EmotivFrameInterpreter getInterpreter() {
+	private FrameInterpreter getInterpreter() {
 		return interpreter;
+	}
+
+	@Override
+	public Sensor getSensor() {
+		return getInterpreter().getSensor();
+	}
+
+	@Override
+	public Integer getGyroX() {
+		return getInterpreter().getGyroX();
+	}
+
+	@Override
+	public Integer getGyroY() {
+		return getInterpreter().getGyroY();
+	}
+
+	@Override
+	public int getQuality() {
+		return getInterpreter().getQuality();
+	}
+
+	@Override
+	public int getValue() {
+		return getInterpreter().getValue();
+	}
+
+	@Override
+	public boolean isBattery() {
+		return getInterpreter().isBattery();
+	}
+
+	@Override
+	public byte[] getFrame() {
+		return getInterpreter().getFrame();
 	}
 
 }

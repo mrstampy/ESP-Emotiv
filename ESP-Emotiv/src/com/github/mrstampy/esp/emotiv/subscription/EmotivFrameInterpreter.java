@@ -20,7 +20,7 @@ package com.github.mrstampy.esp.emotiv.subscription;
 
 import java.io.Serializable;
 
-public class EmotivFrameInterpreter implements Serializable {
+public class EmotivFrameInterpreter implements Serializable, FrameInterpreter {
 	private static final long serialVersionUID = -8341751531911086446L;
 	
 	private final byte[] frame;
@@ -31,34 +31,62 @@ public class EmotivFrameInterpreter implements Serializable {
 		this.frame = frame;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getSensor()
+	 */
+	@Override
 	public Sensor getSensor() {
 		return Sensor.getChannel(frame);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getGyroX()
+	 */
+	@Override
 	public Integer getGyroX() {
 		return 0xFF & frame[29];// - 102;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getGyroY()
+	 */
+	@Override
 	public Integer getGyroY() {
 		return 0xFF & frame[30];// - 104;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getQuality()
+	 */
+	@Override
 	public int getQuality() {
 		if(isBattery()) return getBatteryLevel();
 		
 		return Sensor.QUALITY.apply(frame);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getValue()
+	 */
+	@Override
 	public int getValue() {
 		if(isBattery()) return getBatteryLevel();
 		
 		return getSensor().apply(frame);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#isBattery()
+	 */
+	@Override
 	public boolean isBattery() {
 		return getSensor() == Sensor.BATTERY;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.mrstampy.esp.emotiv.subscription.FrameInterpreter#getFrame()
+	 */
+	@Override
 	public byte[] getFrame() {
 		return frame;
 	}
