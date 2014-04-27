@@ -18,6 +18,7 @@
  */
 package com.github.mrstampy.esp.emotiv.subscription;
 
+// emokit Copyright (C) Samuel Halliday 2012
 public enum Sensor {
 	//@formatter:off
   QUALITY(99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112),

@@ -81,6 +81,7 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 	private Cipher cipher;
 
+	// emokit Copyright (C) Samuel Halliday 2012
 	static {
 		supportedConsumer.add(new byte[] { 33, -1, 31, -1, 30, 0, 0, 0 });
 		supportedConsumer.add(new byte[] { 32, -1, 31, -1, 30, 0, 0, 0 });
@@ -229,12 +230,14 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 		});
 	}
 
+	// emokit Copyright (C) Samuel Halliday 2012
 	private void initCipher() throws Exception {
 		cipher = Cipher.getInstance("AES/ECB/NoPadding");
 		SecretKeySpec key = getKey();
 		cipher.init(Cipher.DECRYPT_MODE, key);
 	}
 
+	// emokit Copyright (C) Samuel Halliday 2012
 	private SecretKeySpec getKey() throws IOException, UsbDisconnectedException, UsbException {
 		if (!isConnected()) return null;
 
@@ -264,6 +267,7 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 		return new SecretKeySpec(bytes, "AES");
 	}
 
+	// emokit Copyright (C) Samuel Halliday 2012
 	private void featureReport() {
 		// HIDDevice dev = info.open();
 		// try {

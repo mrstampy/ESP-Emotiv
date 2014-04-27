@@ -20,6 +20,7 @@ package com.github.mrstampy.esp.emotiv.subscription;
 
 import java.io.Serializable;
 
+// emokit Copyright (C) Samuel Halliday 2012
 public class EmotivFrameInterpreter implements Serializable, FrameInterpreter {
 	private static final long serialVersionUID = -8341751531911086446L;
 	
