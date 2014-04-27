@@ -20,6 +20,7 @@ package com.github.mrstampy.esp.emotiv;
 
 public interface EmotivConstants {
 
+	// emokit Copyright (C) Samuel Halliday 2012
 	public static final short EMOTIV_VENDOR = (short) 0x8609;
 	public static final short EMOTIV_DEVICE = (short) 0x1;
 	
