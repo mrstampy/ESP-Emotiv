@@ -192,7 +192,7 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 	}
 
 	private void notifyListeners(EmotivEvent event) {
-		Observable.from(event).subscribe(new Action1<EmotivEvent>() {
+		Observable.just(event).subscribe(new Action1<EmotivEvent>() {
 
 			@Override
 			public void call(EmotivEvent t1) {
