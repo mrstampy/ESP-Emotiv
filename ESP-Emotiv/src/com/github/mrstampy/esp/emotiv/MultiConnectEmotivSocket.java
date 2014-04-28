@@ -48,6 +48,7 @@ import org.apache.mina.core.service.IoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import rx.Observable;
 import rx.Scheduler;
 import rx.Scheduler.Recurse;
 import rx.functions.Action1;
@@ -255,10 +256,16 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 			@Override
 			public void dataEventOccurred(UsbPipeDataEvent event) {
-				if (isConnected()) {
-					numOutstanding.decrementAndGet();
-					publishMessage(event.getData());
-				}
+				Observable.from(event).subscribe(new Action1<UsbPipeDataEvent>() {
+
+					@Override
+					public void call(UsbPipeDataEvent t1) {
+						if (isConnected()) {
+							numOutstanding.decrementAndGet();
+							publishMessage(t1.getData());
+						}
+					}
+				});
 			}
 		});
 	}
