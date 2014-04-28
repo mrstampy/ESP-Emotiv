@@ -22,6 +22,7 @@ package com.github.mrstampy.esp.emotiv;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.Cipher;
@@ -47,6 +48,11 @@ import org.apache.mina.core.service.IoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import rx.Scheduler;
+import rx.Scheduler.Recurse;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 import com.github.mrstampy.esp.emotiv.subscription.EmotivEvent;
 import com.github.mrstampy.esp.emotiv.subscription.EmotivEventListener;
 import com.github.mrstampy.esp.emotiv.subscription.EmotivFrameInterpreter;
@@ -61,11 +67,11 @@ import com.github.mrstampy.esp.multiconnectionsocket.MultiConnectionSocketExcept
  */
 public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte[]> implements EmotivConstants {
 	private static final Logger log = LoggerFactory.getLogger(MultiConnectEmotivSocket.class);
+	private static final int MAX_NUM_OUTSTANDING = 10;
 
 	private UsbInterface usbInterface;
 	private UsbPipe emotivPipe;
 	private UsbDevice emotiv;
-	private EmotivReader reader;
 
 	private volatile boolean connected;
 
@@ -75,9 +81,11 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 	private AtomicInteger numOutstanding = new AtomicInteger();
 
+	private Scheduler scheduler = Schedulers.executor(Executors.newScheduledThreadPool(5));
+
 	// wat is dis?
 	private static final List<byte[]> supportedConsumer = new ArrayList<byte[]>();
-//	private static final List<byte[]> supportedResearch = new ArrayList<byte[]>();
+	// private static final List<byte[]> supportedResearch = new ArrayList<byte[]>();
 	private volatile boolean research = false;
 
 	private Cipher cipher;
@@ -190,8 +198,32 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 	}
 
 	private void startReadThread() {
-		reader = new EmotivReader();
-		reader.start();
+		scheduler.scheduleRecursive(new Action1<Scheduler.Recurse>() {
+
+			@Override
+			public void call(Recurse t1) {
+				if (!isConnected()) return;
+
+				addBytesToPipe();
+
+				t1.schedule();
+			}
+		});
+	}
+
+	private void addBytesToPipe() {
+		try {
+			byte[] b = new byte[32];
+			emotivPipe.asyncSubmit(b);
+
+			int num = numOutstanding.incrementAndGet();
+			while (isConnected() && num > MAX_NUM_OUTSTANDING) {
+				Thread.sleep(1);
+				num = numOutstanding.get();
+			}
+		} catch (Exception e) {
+			log.error("Problem reading from the Nia", e);
+		}
 	}
 
 	private void initDevice() throws Exception {
@@ -209,8 +241,8 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 		UsbConfiguration config = emotiv.getActiveUsbConfiguration();
 		usbInterface = config.getUsbInterface((byte) EMOTIV_DEVICE);
-		
-		//TODO find the correct value for EMOTIV_ENDPOINT_1
+
+		// TODO find the correct value for EMOTIV_ENDPOINT_1
 		UsbEndpoint ue = usbInterface.getUsbEndpoint((byte) EMOTIV_ENDPOINT_1);
 		emotivPipe = ue.getUsbPipe();
 
@@ -307,33 +339,6 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 		}
 
 		return null;
-	}
-
-	private class EmotivReader extends Thread {
-
-		private static final int MAX_NUM_OUTSTANDING = 10;
-
-		public void run() {
-			byte[] buf;
-			while (isConnected()) {
-				try {
-					buf = new byte[32];
-					emotivPipe.asyncSubmit(buf);
-					checkOutstanding();
-				} catch (Exception e) {
-					log.error("Problem reading Emotiv data", e);
-					break;
-				}
-			}
-		}
-
-		private void checkOutstanding() throws InterruptedException {
-			int num = numOutstanding.incrementAndGet();
-			while (isConnected() && num > MAX_NUM_OUTSTANDING) {
-				Thread.sleep(2);
-				num = numOutstanding.get();
-			}
-		}
 	}
 
 }
