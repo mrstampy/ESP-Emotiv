@@ -86,7 +86,8 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 	// wat is dis?
 	private static final List<byte[]> supportedConsumer = new ArrayList<byte[]>();
-	// private static final List<byte[]> supportedResearch = new ArrayList<byte[]>();
+	// private static final List<byte[]> supportedResearch = new
+	// ArrayList<byte[]>();
 	private volatile boolean research = false;
 
 	private Cipher cipher;
@@ -191,11 +192,17 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 	}
 
 	private void notifyListeners(EmotivEvent event) {
-		if (listeners.isEmpty()) return;
+		Observable.from(event).subscribe(new Action1<EmotivEvent>() {
 
-		for (EmotivEventListener l : listeners) {
-			l.emotivEventPerformed(event);
-		}
+			@Override
+			public void call(EmotivEvent t1) {
+				if (listeners.isEmpty()) return;
+
+				for (EmotivEventListener l : listeners) {
+					l.emotivEventPerformed(t1);
+				}
+			}
+		});
 	}
 
 	private void startReadThread() {
@@ -256,16 +263,8 @@ public class MultiConnectEmotivSocket extends AbstractMultiConnectionSocket<byte
 
 			@Override
 			public void dataEventOccurred(UsbPipeDataEvent event) {
-				Observable.from(event).subscribe(new Action1<UsbPipeDataEvent>() {
-
-					@Override
-					public void call(UsbPipeDataEvent t1) {
-						if (isConnected()) {
-							numOutstanding.decrementAndGet();
-							publishMessage(t1.getData());
-						}
-					}
-				});
+				numOutstanding.decrementAndGet();
+				publishMessage(event.getData());
 			}
 		});
 	}
